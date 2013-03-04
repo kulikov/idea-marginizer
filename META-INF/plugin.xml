@@ -1,0 +1,19 @@
+<idea-plugin version="2">
+    <id>ru.kulikovd.marginizer</id>
+    <name>Marginizer</name>
+    <description><![CDATA[Add margin to key / value pair]]></description>
+    <vendor url="" email="kulikov.dm@gmail.com">Kulikov Dmitry</vendor>
+    <version>1.0</version>
+
+    <idea-version since-build="107.105"/>
+
+    <actions>
+        <group id="MarginizerActionGroup" text="Add margin to key / value pair" popup="false">
+            <separator/>
+            <action id="MarginizerAction" class="ru.kulikovd.marginizer.MarginizerAction" text="Marginize" description="Add margin to key / value pair"/>
+            <add-to-group group-id="EditMenu" anchor="last"/>
+        </group>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij"/>
+</idea-plugin>
