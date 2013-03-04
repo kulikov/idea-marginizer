@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 public class MarginizerAction extends AnAction {
 
     public MarginizerAction() {
-        super("Marginazer");
+        super("Marginizer");
     }
 
     /**
