@@ -72,7 +72,7 @@ class Marginizer {
 
                 String[] lines = txt.split("/\\r\\n|\\n|\\r/");
 
-                Pattern pt = Pattern.compile("^([^=]+)(=.+)$");
+                Pattern pt = Pattern.compile("^([^→=⇒]+)([→=⇒].+)$");
 
                 ArrayList<ArrayList<String>> output = new ArrayList<ArrayList<String>>(lines.length);
 
