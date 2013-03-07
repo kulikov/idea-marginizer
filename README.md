@@ -1,4 +1,4 @@
-idea-marginizer
+Key = value aligner
 ===============
 
 IDEA Plugin for align key = value pair
