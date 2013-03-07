@@ -19,8 +19,7 @@ val testActor    = actorSystem.actorFor(Props(new Producer))
 Imports beautifier
 ==================
 
-Rearrange imports for grouping by lexical scope.
-Imports in each group sorted alphabetically.
+Rearrange imports with grouping by lexical scope. Imports in each group sorted alphabetically.
 
 Before: 
 ```scala
