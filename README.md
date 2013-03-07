@@ -32,6 +32,7 @@ import ru.kulikovd.common.util.Time
 import ru.kulikovd.myproject.config.Factory
 import scala.collection.JavaConversions._
 import ru.kulikovd.myproject.core.Registry
+import ru.kulikovd.myproject.Settings
 import ru.kulikovd.myproject.module.Repository
 import ru.kulikovd.othermodule._
 import scala.collection.mutable.{Map ⇒ MutableMap}
@@ -54,7 +55,8 @@ import grizzled.slf4j.Logging
 import ru.kulikovd.common.util.Time // 3. other modules from own project
 import ru.kulikovd.othermodule._
 
-import ru.kulikovd.myproject.module.Repository // 4. local imports in current module
+import ru.kulikovd.myproject.Settings
 import ru.kulikovd.myproject.config.Factory
 import ru.kulikovd.myproject.core.Registry
+import ru.kulikovd.myproject.module.Repository // 4. local imports in current module
 ```
