@@ -100,7 +100,7 @@ class ImportBeautifier {
                     if (tS.startsWith("java")) {
                         jvGroup.add(tS);
                     } else if (tS.startsWith("scala")) {
-                        scGroup.add(tS);
+                        jvGroup.add(tS); // scala and java in single group
                     } else if (tS.startsWith(prefix)) {
                         userGroup.add(tS);
                     } else {
