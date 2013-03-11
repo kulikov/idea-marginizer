@@ -15,6 +15,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,6 +58,13 @@ public class ImportBeautifierAction extends AnAction {
 
 class ImportBeautifier {
 
+    private static Comparator<String> comparator = new Comparator<String>() {
+        @Override
+        public int compare(String s, String s2) {
+            return s.replaceAll("\\{", "1").compareTo(s2.replaceAll("\\{", "1"));
+        }
+    };
+
     public static void run(final AnActionEvent event) {
 
         Editor editor = event.getData(PlatformDataKeys.EDITOR);
@@ -74,8 +82,6 @@ class ImportBeautifier {
             List<String> scGroup = new ArrayList<String>();
             List<String> party3Group = new ArrayList<String>();
             List<String> userGroup = new ArrayList<String>();
-
-
 
             if (hasSelection && mc.find()) {
                 String pack     = mc.group(1);
@@ -107,10 +113,12 @@ class ImportBeautifier {
                         party3Group.add(tS);
                     }
                 }
-                Collections.sort(jvGroup);
-                Collections.sort(scGroup);
-                Collections.sort(userGroup);
-                Collections.sort(party3Group);
+
+                Collections.sort(jvGroup, comparator);
+                Collections.sort(scGroup, comparator);
+                Collections.sort(userGroup, comparator);
+                Collections.sort(party3Group, comparator);
+
                 String result = "";
                 if (!jvGroup.isEmpty()) {
                     result += "\n\nimport " + StringUtils.join(jvGroup, "\nimport ");
