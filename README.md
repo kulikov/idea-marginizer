@@ -43,20 +43,19 @@ After:
 ```scala
 package ru.kulikovd.myproject.module
 
-import java.util.Date // 1. java imports group
-
-import scala.collection.JavaConversions._ // 2. scala 
+import java.util.Date         // 1. core java and scala imports group
+import scala.collection.JavaConversions._
 import scala.collection.mutable.{Map ⇒ MutableMap}
 
-import com.rabbitmq.client.Envelope // 3. third party libraries
+import com.rabbitmq.client.Envelope     // 2. third party libraries
 import com.typesafe.config.Config
 import grizzled.slf4j.Logging
 
-import ru.kulikovd.common.util.Time // 3. other modules from own project
+import ru.kulikovd.common.util.Time     // 3. other modules from own project
 import ru.kulikovd.othermodule._
 
-import ru.kulikovd.myproject.Settings
+import ru.kulikovd.myproject.Settings      // 4. local imports in current module
 import ru.kulikovd.myproject.config.Factory
 import ru.kulikovd.myproject.core.Registry
-import ru.kulikovd.myproject.module.Repository // 4. local imports in current module
+import ru.kulikovd.myproject.module.Repository 
 ```
