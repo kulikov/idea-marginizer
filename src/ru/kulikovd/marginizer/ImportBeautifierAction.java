@@ -1,5 +1,12 @@
 package ru.kulikovd.marginizer;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -12,13 +19,6 @@ import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import org.apache.commons.lang.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 
 /**
@@ -55,8 +55,9 @@ public class ImportBeautifierAction extends AnAction {
 }
 
 
-
 class ImportBeautifier {
+
+    private static Pattern packagaRegexp = Pattern.compile("^\\s*package ([^;\\s]+)", Pattern.MULTILINE);
 
     private static Comparator<String> comparator = new Comparator<String>() {
         @Override
@@ -74,22 +75,44 @@ class ImportBeautifier {
 
             SelectionModel selectionModel = editor.getSelectionModel();
             boolean hasSelection = selectionModel.hasSelection();
+
             String text = document.getText();
-            Pattern pt = Pattern.compile("^\\s*package ([^;\\s]+)", Pattern.MULTILINE);
-            Matcher mc = pt.matcher(text);
+            Matcher packageMatch = packagaRegexp.matcher(text);
 
             List<String> jvGroup = new ArrayList<String>();
             List<String> scGroup = new ArrayList<String>();
             List<String> party3Group = new ArrayList<String>();
             List<String> userGroup = new ArrayList<String>();
 
-            if (hasSelection && mc.find()) {
-                String pack     = mc.group(1);
+            if (packageMatch.find()) {
+                String pack = packageMatch.group(1);
                 String[] splits = pack.split("\\.");
-                String prefix   = splits[0] + "." + splits[1];
-                int offsetStart = document.getLineStartOffset(document.getLineNumber(selectionModel.getSelectionStart()));
-                int offsetEnd   = document.getLineEndOffset(document.getLineNumber(selectionModel.getSelectionEnd()));
-                String txt      = document.getCharsSequence().subSequence(offsetStart, offsetEnd).toString();
+                String prefix = splits[0] + "." + splits[1];
+
+                String txt = "";
+                int offsetStart = 0;
+                int offsetEnd = 0;
+
+                if (hasSelection) {
+                    offsetStart = document.getLineStartOffset(document.getLineNumber(selectionModel.getSelectionStart()));
+                    offsetEnd = document.getLineEndOffset(document.getLineNumber(selectionModel.getSelectionEnd()));
+                    txt = document.getCharsSequence().subSequence(offsetStart, offsetEnd).toString();
+                } else {
+                    offsetStart = document.getLineStartOffset(2);
+                    txt = document.getCharsSequence().subSequence(offsetStart, document.getCharsSequence().length()).toString();
+
+                    int n = 1;
+                    for (String l : txt.split("\n")) {
+                        if (l.startsWith("import") || l.trim().equals("")) {
+                            n += 1;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    offsetEnd = document.getLineEndOffset(n);
+                    txt = document.getCharsSequence().subSequence(offsetStart, offsetEnd).toString();
+                }
 
                 Matcher m = Pattern.compile("^\\s*").matcher(txt);
                 String startSpaces = m.find() ? m.group(0) : "";
@@ -97,62 +120,63 @@ class ImportBeautifier {
                 m = Pattern.compile("\\s*$").matcher(txt);
                 String endSpaces = m.find() ? m.group(0) : "";
 
-                String[] lines  = txt.split("import ");
-                for(String t : lines) {
-                    String tS = t.trim();
-                    if (tS.isEmpty()) {
-                        continue;
-                    }
-                    if (tS.startsWith("java.")) {
-                        jvGroup.add(tS);
-                    } else if (tS.startsWith("scala.")) {
-                        jvGroup.add(tS); // scala and java in single group
-                    } else if (tS.startsWith(prefix)) {
-                        userGroup.add(tS);
-                    } else {
-                        party3Group.add(tS);
-                    }
-                }
+                String[] lines = txt.split("import ");
 
-                Collections.sort(jvGroup, comparator);
-                Collections.sort(scGroup, comparator);
-                Collections.sort(userGroup, comparator);
-                Collections.sort(party3Group, comparator);
-
-                String result = "";
-                if (!jvGroup.isEmpty()) {
-                    result += "\n\nimport " + StringUtils.join(jvGroup, "\nimport ");
-                }
-                if (!scGroup.isEmpty()) {
-                    result += "\n\nimport " + StringUtils.join(scGroup, "\nimport ");
-                }
-                if (!party3Group.isEmpty()) {
-                    result += "\n\nimport " +StringUtils.join(party3Group, "\nimport ");
-                }
-                if (!userGroup.isEmpty()) {
-                    String maxPref = maxPrefix(pack, userGroup);
-
-                    if (maxPref == null) {
-                        result += "\n\nimport " + StringUtils.join(userGroup, "\nimport ");
-                    }
-                    else {
-                        List<String> thisModule = new ArrayList<String>();
-                        List<String> otherModule = new ArrayList<String>();
-                        for (String t : userGroup) {
-                            if (t.startsWith(maxPref)) {
-                                thisModule.add(t);
-                            }
-                            else {
-                                otherModule.add(t);
-                            }
+                if (lines.length > 1) {
+                    for (String t : lines) {
+                        String tS = t.trim();
+                        if (tS.isEmpty()) {
+                            continue;
                         }
-                        if (!otherModule.isEmpty())
-                            result += "\n\nimport " + StringUtils.join(otherModule, "\nimport ");
-                        if (!thisModule.isEmpty())
-                            result += "\n\nimport " + StringUtils.join(thisModule, "\nimport ");
+                        if (tS.startsWith("java.")) {
+                            jvGroup.add(tS);
+                        } else if (tS.startsWith("scala.")) {
+                            jvGroup.add(tS); // scala and java in single group
+                        } else if (tS.startsWith(prefix)) {
+                            userGroup.add(tS);
+                        } else {
+                            party3Group.add(tS);
+                        }
                     }
+
+                    Collections.sort(jvGroup, comparator);
+                    Collections.sort(scGroup, comparator);
+                    Collections.sort(userGroup, comparator);
+                    Collections.sort(party3Group, comparator);
+
+                    String result = "";
+                    if (!jvGroup.isEmpty()) {
+                        result += "\n\nimport " + StringUtils.join(jvGroup, "\nimport ");
+                    }
+                    if (!scGroup.isEmpty()) {
+                        result += "\n\nimport " + StringUtils.join(scGroup, "\nimport ");
+                    }
+                    if (!party3Group.isEmpty()) {
+                        result += "\n\nimport " + StringUtils.join(party3Group, "\nimport ");
+                    }
+                    if (!userGroup.isEmpty()) {
+                        String maxPref = maxPrefix(pack, userGroup);
+
+                        if (maxPref == null) {
+                            result += "\n\nimport " + StringUtils.join(userGroup, "\nimport ");
+                        } else {
+                            List<String> thisModule = new ArrayList<String>();
+                            List<String> otherModule = new ArrayList<String>();
+                            for (String t : userGroup) {
+                                if (t.startsWith(maxPref)) {
+                                    thisModule.add(t);
+                                } else {
+                                    otherModule.add(t);
+                                }
+                            }
+                            if (!otherModule.isEmpty())
+                                result += "\n\nimport " + StringUtils.join(otherModule, "\nimport ");
+                            if (!thisModule.isEmpty())
+                                result += "\n\nimport " + StringUtils.join(thisModule, "\nimport ");
+                        }
+                    }
+                    document.replaceString(offsetStart, offsetEnd, startSpaces + result.trim() + endSpaces);
                 }
-                document.replaceString(offsetStart, offsetEnd, startSpaces + result.trim() + endSpaces);
             }
         }
     }
@@ -164,7 +188,7 @@ class ImportBeautifier {
                 if (matchCount > 0) {
                     return pack;
                 }
-                matchCount ++;
+                matchCount++;
             }
         }
         String[] splits = pack.split("\\.");
