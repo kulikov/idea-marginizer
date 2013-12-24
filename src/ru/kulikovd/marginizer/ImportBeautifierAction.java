@@ -62,7 +62,7 @@ class ImportBeautifier {
     private static Comparator<String> comparator = new Comparator<String>() {
         @Override
         public int compare(String s, String s2) {
-            return s.replaceAll("\\{", "1").compareTo(s2.replaceAll("\\{", "1"));
+            return s.replaceAll("[\\{_]", "1").compareTo(s2.replaceAll("[\\{_]", "1"));
         }
     };
 
