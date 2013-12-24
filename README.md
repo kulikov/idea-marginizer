@@ -1,3 +1,5 @@
+Download — https://github.com/kulikov/idea-marginizer/releases/download/v1.1.8/idea-marginizer.jar
+
 Key = value aligner
 ===============
 
