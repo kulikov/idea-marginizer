@@ -3,7 +3,7 @@
     <name>Marginizer</name>
     <description><![CDATA[Add margin to key / value pair]]></description>
     <vendor url="" email="kulikov.dm@gmail.com">Kulikov Dmitry</vendor>
-    <version>1.1.8</version>
+    <version>1.1.9</version>
 
     <idea-version since-build="107.105"/>
 

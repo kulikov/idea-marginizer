@@ -1,12 +1,5 @@
 package ru.kulikovd.marginizer;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -19,6 +12,13 @@ import com.intellij.openapi.editor.SelectionModel;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -87,7 +87,13 @@ class ImportBeautifier {
             if (packageMatch.find()) {
                 String pack = packageMatch.group(1);
                 String[] splits = pack.split("\\.");
-                String prefix = splits[0] + "." + splits[1];
+
+                String prefix = "";
+                if (splits.length > 1) {
+                    prefix = splits[0] + "." + splits[1];
+                } else {
+                    prefix = splits[0];
+                }
 
                 String txt = "";
                 int offsetStart = 0;
